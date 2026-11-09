@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>專注力與執行力極速挑戰</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --danger: #ef4444;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    /* 全螢幕大廳等待畫面 */
+    .start-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .start-screen.hidden {
+      display: none;
+    }
+
+    .start-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      padding: 28px 20px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .start-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 12px;
+    }
+
+    .start-desc {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .btn-start {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .btn-start:active {
+      transform: scale(0.98);
+    }
+
+    /* 頂部固定倒數列 */
+    .header-sticky {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      z-index: 100;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    .timer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: var(--primary);
+      color: white;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    .timer-title {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .timer-display {
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-family: monospace;
+      background: rgba(0,0,0,0.2);
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .qr-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .notice-banner {
+      background-color: var(--warning-bg);
+      color: var(--warning-text);
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-align: center;
+      line-height: 1.4;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    /* 主要內容容器 */
+    .container {
+      width: 100%;
+      max-width: 480px;
+      padding: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e5e7eb;
+    }
+
+    .question-num {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      color: var(--text-main);
+      line-weight: 600;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    /* 表單與互動元件 */
+    input[type="text"], input[type="date"], textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .circle-canvas-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .circle-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f9fafb;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    canvas.circle-canvas {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .check-btn-wrapper {
+      margin-top: 6px;
+      width: 100%;
+    }
+
+    .check-btn {
+      width: 100%;
+      padding: 6px 0;
+      font-size: 0.75rem;
+      font-weight: bold;
+      background: #e2e8f0;
+      color: #475569;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .check-btn.checked {
+      background: var(--success);
+      color: white;
+    }
+
+    .interactive-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .interactive-btn:active {
+      background-color: #e5e7eb;
+      transform: scale(0.98);
+    }
+
+    .signature-pad {
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 10px;
+      background: #f8fafc;
+      touch-action: none;
+      width: 100%;
+      height: 120px;
+    }
+
+    .clear-btn {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--danger);
+      background: none;
+      border: none;
+      cursor: pointer;
+      float: right;
+    }
+
+    .submit-card {
+      background: #e0e7ff;
+      border: 2px solid var(--primary);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+    }
+
+    /* 彈窗 Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .modal-close-btn {
+      width: 100%;
+      padding: 10px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    #qrcode-img {
+      margin: 12px auto;
+      display: block;
+      width: 180px;
+      height: 180px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 全螢幕大廳等待畫面 -->
+  <div class="start-screen" id="startScreen">
+    <div class="start-box">
+      <div class="start-title">⚡ 專注力極速挑戰</div>
+      <div class="start-desc">
+        歡迎來到專注力與執行力測試！<br><br>
+        點擊下方按鈕後將立即啟動 <b>3 分鐘倒數計時</b>。<br>
+        請大家準備就緒後統一點擊開始！
+      </div>
+      <button class="btn-start" id="startBtn">🚀 開始作答</button>
+    </div>
+  </div>
+
+  <!-- 2. 頂部固定資訊與倒數 -->
+  <div class="header-sticky">
+    <div class="timer-bar">
+      <div class="timer-title">⚡ 剩餘時間</div>
+      <div class="timer-display" id="timer">03:00</div>
+      <button class="qr-btn" onclick="openQrModal()">📱 QR Code</button>
+    </div>
+    <div class="notice-banner">
+      ⚠️ 【重要規則】請先花 1 分鐘「從頭到尾完整閱讀」所有題目，再開始作答。
+    </div>
+  </div>
+
+  <!-- 3. 題目主要區域 -->
+  <div class="container">
+
+    <div class="card">
+      <div class="question-num">Question 01</div>
+      <div class="question-text">在這張紙的最右上角寫下你的名字。</div>
+      <input type="text" id="q1" placeholder="輸入你的名字...">
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 02</div>
+      <div class="question-text">在名字下方寫上今天的日期。</div>
+      <input type="date" id="q2">
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 03</div>
+      <div class="question-text">大聲對隔壁的人說一聲：「早安！」</div>
+      <button class="interactive-btn" onclick="alert('很好！請確定隔壁有聽到喔！')">🗣️ 點我確認已大聲說早安</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 04</div>
+      <div class="question-text">在下方三個框框內各畫一個圓形。</div>
+      <div class="circle-canvas-container">
+        <div class="circle-box">
+          <canvas class="circle-canvas" id="circle1" width="80" height="80"></canvas>
+          <div class="check-btn-wrapper">
+            <button class="check-btn" id="check1" onclick="toggleCheck(1)">打勾 ✓</button>
+          </div>
+        </div>
+        <div class="circle-box">
+          <canvas class="circle-canvas" id="circle2" width="80" height="80"></canvas>
+          <div class="check-btn-wrapper">
+            <button class="check-btn" id="check2" onclick="toggleCheck(2)">打勾 ✓</button>
+          </div>
+        </div>
+        <div class="circle-box">
+          <canvas class="circle-canvas" id="circle3" width="80" height="80"></canvas>
+          <div class="check-btn-wrapper">
+            <button class="check-btn" id="check3" onclick="toggleCheck(3)">打勾 ✓</button>
+          </div>
+        </div>
+      </div>
+      <button class="clear-btn" onclick="clearCircles()">重畫圓形</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 05</div>
+      <div class="question-text">用筆在你的手錶或手機螢幕上輕敲三下。</div>
+      <button class="interactive-btn" onclick="tapScreen(this)">📱 輕敲三下螢幕 (0/3)</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 06</div>
+      <div class="question-text">站起來轉一圈，然後坐下。</div>
+      <button class="interactive-btn" onclick="alert('轉完圈請重新坐好！')">🔄 已完成轉圈</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 07</div>
+      <div class="question-text">在心裡默數 1 到 5。</div>
+      <button class="interactive-btn" id="countBtn" onclick="startCount()">⏱️ 按下開始默數 5 秒</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 08</div>
+      <div class="question-text">用右手摸一下你的左耳。</div>
+      <button class="interactive-btn" onclick="alert('很好！維持專注！')">👂 已用右手摸左耳</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 09</div>
+      <div class="question-text">模仿貓咪學喵叫一聲「喵～」。</div>
+      <button class="interactive-btn" onclick="alert('喵～ 🐱 很有感！')">🐱 點我發出喵叫聲</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 10</div>
+      <div class="question-text">與你右邊的人禮貌地握握手。</div>
+      <button class="interactive-btn" onclick="alert('🤝 握手完成！')">🤝 已與右邊夥伴握手</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 11</div>
+      <div class="question-text">用左手拍拍自己的頭頂三下。</div>
+      <button class="interactive-btn" onclick="alert('拍拍頭，繼續保持注意力！')">✋ 已拍頭三下</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 12</div>
+      <div class="question-text">深呼吸一次並吐氣。</div>
+      <button class="interactive-btn" onclick="alert('呼～ 保持平靜！')">🌬️ 深呼吸完成</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 13</div>
+      <div class="question-text">舉高你的手機 3 秒鐘。</div>
+      <button class="interactive-btn" id="liftBtn" onclick="liftPhone()">📱 舉高手機計時</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 14</div>
+      <div class="question-text">跟左邊的人眨一下眼睛。</div>
+      <button class="interactive-btn" onclick="alert('😉 眨眼示意完成！')">😉 已向左邊眨眼</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 15</div>
+      <div class="question-text">在心裡快速算一下 12 + 15 = ？</div>
+      <input type="text" placeholder="答案是...">
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 16</div>
+      <div class="question-text">輕輕敲擊兩下你的膝蓋。</div>
+      <button class="interactive-btn" onclick="alert('膝蓋敲擊完成！')">🦵 已敲擊膝蓋</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 17</div>
+      <div class="question-text">向對面的夥伴揮揮手。</div>
+      <button class="interactive-btn" onclick="alert('👋 揮手打招呼完成！')">👋 已揮手</button>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 18</div>
+      <div class="question-text">在第 4 題的圓形裡面各打一個勾。</div>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">（請直接回第 4 題點擊「打勾」按鈕）</p>
+    </div>
+
+    <div class="card">
+      <div class="question-num">Question 19</div>
+      <div class="question-text">在這行字下面簽名。</div>
+      <canvas id="sigCanvas" class="signature-pad"></canvas>
+      <button class="clear-btn" onclick="clearSig()">清除簽名</button>
+    </div>
+
+    <div class="card submit-card">
+      <div class="question-num" style="color: var(--danger);">Question 20 (Final)</div>
+      <div class="question-text" style="font-weight: bold;">
+        以上第 1 題到第 19 題的指令通通「不用做」。你只需要在最下方寫下：『我看完了』，然後保持安靜，雙手抱胸看著其他人繼續做即可。
+      </div>
+      <input type="text" id="q20" placeholder="請在此輸入指定文字..." style="margin-bottom: 12px;">
+      <button class="submit-btn" onclick="validateForm()">提出作答結果</button>
+    </div>
+
+  </div>
+
+  <!-- 4. 彈窗 Modal UI -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-box">
+      <div class="modal-icon" id="modalIcon">🎉</div>
+      <div class="modal-title" id="modalTitle">挑戰結果</div>
+      <div class="modal-desc" id="modalDesc">內容描述</div>
+      <button class="modal-close-btn" onclick="closeModal()">關閉</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal-box">
+      <div class="modal-title">📱 掃描 QR Code 挑戰</div>
+      <img id="qrcode-img" src="" alt="QR Code">
+      <div class="modal-desc" style="font-size: 0.8rem;">讓其他人掃描加入此遊戲</div>
+      <button class="modal-close-btn" onclick="closeQrModal()">關閉</button>
+    </div>
+  </div>
+
+  <script>
+    // 1. 遊戲開始與倒數機制
+    let timeLeft = 180;
+    let timerInterval = null;
+
+    document.getElementById('startBtn').addEventListener('click', function() {
+      // 隱藏大廳等待畫面
+      document.getElementById('startScreen').classList.add('hidden');
+      
+      // 啟動倒數計時器
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        let s = (timeLeft % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${m}:${s}`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          showModal('⏰ 時間到！', '3 分鐘極速挑戰結束，看看你是否通過了專注力考驗！', '⏳');
+        }
+      }, 1000);
+    });
+
+    // 2. 第 4 題：圓形畫布與連動打勾
+    const circles = [
+      { canvas: document.getElementById('circle1'), drawn: false, checked: false },
+      { canvas: document.getElementById('circle2'), drawn: false, checked: false },
+      { canvas: document.getElementById('circle3'), drawn: false, checked: false }
+    ];
+
+    circles.forEach((item, index) => {
+      const cvs = item.canvas;
+      const ctx = cvs.getContext('2d');
+      let isDrawing = false;
+
+      function startDraw(e) {
+        isDrawing = true;
+        item.drawn = true;
+        draw(e);
+      }
+      function endDraw() { isDrawing = false; ctx.beginPath(); }
+      function draw(e) {
+        if (!isDrawing) return;
+        const rect = cvs.getBoundingClientRect();
+        const touch = e.touches ? e.touches[0] : e;
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#4f46e5';
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+      }
+
+      cvs.addEventListener('mousedown', startDraw);
+      cvs.addEventListener('mouseup', endDraw);
+      cvs.addEventListener('mousemove', draw);
+      cvs.addEventListener('touchstart', startDraw);
+      cvs.addEventListener('touchend', endDraw);
+      cvs.addEventListener('touchmove', draw);
+    });
+
+    function toggleCheck(num) {
+      const item = circles[num - 1];
+      const btn = document.getElementById(`check${num}`);
+      item.checked = !item.checked;
+      if (item.checked) {
+        btn.classList.add('checked');
+        btn.innerText = '已打勾 ✓';
+      } else {
+        btn.classList.remove('checked');
+        btn.innerText = '打勾 ✓';
+      }
+    }
+
+    function clearCircles() {
+      circles.forEach((item, idx) => {
+        const ctx = item.canvas.getContext('2d');
+        ctx.clearRect(0, 0, item.canvas.width, item.canvas.height);
+        item.drawn = false;
+        item.checked = false;
+        const btn = document.getElementById(`check${idx + 1}`);
+        btn.classList.remove('checked');
+        btn.innerText = '打勾 ✓';
+      });
+    }
+
+    // 3. 互動按鈕功能
+    let tapCount = 0;
+    function tapScreen(btn) {
+      tapCount++;
+      btn.innerText = `📱 輕敲三下螢幕 (${tapCount}/3)`;
+      if(tapCount >= 3) {
+        setTimeout(() => alert('已完成輕敲三下！'), 100);
+      }
+    }
+
+    function startCount() {
+      let btn = document.getElementById('countBtn');
+      let c = 5;
+      btn.disabled = true;
+      let timer = setInterval(() => {
+        btn.innerText = `⏱️ 默數中... ${c}`;
+        c--;
+        if (c < 0) {
+          clearInterval(timer);
+          btn.innerText = `✅ 默數完成`;
+          btn.disabled = false;
+        }
+      }, 1000);
+    }
+
+    function liftPhone() {
+      let btn = document.getElementById('liftBtn');
+      let c = 3;
+      btn.disabled = true;
+      let timer = setInterval(() => {
+        btn.innerText = `📱 保持舉高... ${c}s`;
+        c--;
+        if (c < 0) {
+          clearInterval(timer);
+          btn.innerText = `✅ 舉高完成`;
+          btn.disabled = false;
+        }
+      }, 1000);
+    }
+
+    // 4. 第 19 題簽名板
+    const sigCanvas = document.getElementById('sigCanvas');
+    const sigCtx = sigCanvas.getContext('2d');
+    let isSigDrawing = false;
+    let hasSigned = false;
+
+    function resizeSigCanvas() {
+      sigCanvas.width = sigCanvas.offsetWidth;
+      sigCanvas.height = sigCanvas.offsetHeight;
+    }
+    window.addEventListener('load', resizeSigCanvas);
+
+    function startSig(e) { isSigDrawing = true; hasSigned = true; drawSig(e); }
+    function endSig() { isSigDrawing = false; sigCtx.beginPath(); }
+    function drawSig(e) {
+      if (!isSigDrawing) return;
+      const rect = sigCanvas.getBoundingClientRect();
+      const touch = e.touches ? e.touches[0] : e;
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      sigCtx.lineWidth = 2;
+      sigCtx.lineCap = 'round';
+      sigCtx.strokeStyle = '#000000';
+      sigCtx.lineTo(x, y);
+      sigCtx.stroke();
+      sigCtx.beginPath();
+      sigCtx.moveTo(x, y);
+    }
+
+    sigCanvas.addEventListener('mousedown', startSig);
+    sigCanvas.addEventListener('mouseup', endSig);
+    sigCanvas.addEventListener('mousemove', drawSig);
+    sigCanvas.addEventListener('touchstart', startSig);
+    sigCanvas.addEventListener('touchend', endSig);
+    sigCanvas.addEventListener('touchmove', drawSig);
+
+    function clearSig() {
+      sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+      hasSigned = false;
+    }
+
+    // 5. 陷阱驗證邏輯 (第 20 題)
+    function validateForm() {
+      const q1 = document.getElementById('q1').value.trim();
+      const q2 = document.getElementById('q2').value;
+      const q20 = document.getElementById('q20').value.trim();
+      const hasDrawnCircle = circles.some(c => c.drawn || c.checked);
+
+      const didOtherQuestions = q1 !== "" || q2 !== "" || hasSigned || hasDrawnCircle || tapCount > 0;
+
+      if (didOtherQuestions) {
+        showModal('❌ 挑戰失敗！被騙到了吧～', '第 20 題明明寫著：「第 1 題到第 19 題的指令通通不用做」！你花時間做前面的題目囉！', '🤪');
+      } else if (q20 === '我看完了') {
+        showModal('🎉 恭喜通關！專注力大師！', '你成功完整閱讀了題目，沒有掉入陷阱！<br><br><b>請保持安靜，雙手抱胸看著其他人繼續做！</b>', '🏆');
+        if (timerInterval) clearInterval(timerInterval);
+      } else {
+        showModal('⚠️ 差一點點！', '你雖然沒有做前面的題目，但第 20 題要精確填寫『我看完了』喔！', '🧐');
+      }
+    }
+
+    // 6. Modal 彈窗控制
+    function showModal(title, desc, icon) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalDesc').innerHTML = desc;
+      document.getElementById('modalIcon').innerText = icon;
+      document.getElementById('resultModal').classList.add('active');
+    }
+    function closeModal() {
+      document.getElementById('resultModal').classList.remove('active');
+    }
+
+    // 7. QR Code 產生
+    function openQrModal() {
+      const currentUrl = encodeURIComponent(window.location.href);
+      const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${currentUrl}`;
+      document.getElementById('qrcode-img').src = qrApi;
+      document.getElementById('qrModal').classList.add('active');
+    }
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
